@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Ai\Tools;
 
 use Carbon\Carbon;
@@ -12,25 +13,25 @@ class GetCurrentDateTime implements Tool
     /**
      * Get the description of the tool's purpose.
      */
-    public function description(): Stringable | string
+    public function description(): Stringable|string
     {
         return 'Get the current date, time, and day of the weeks.'
-            . 'Use this whenever the user asks about today\'s date,'
-            . 'the current time, or what day it is.';
+            .'Use this whenever the user asks about today\'s date,'
+            .'the current time, or what day it is.';
     }
 
     /**
      * Execute the tool.
      */
-    public function handle(Request $request): Stringable | string
+    public function handle(Request $request): Stringable|string
     {
         $now = Carbon::now();
 
         $format = $request['format'] ?? 'full';
 
         return match ($format) {
-            'date'  => $now->toFormattedDateString(),
-            'time'  => $now->format('h:i A'),
+            'date' => $now->toFormattedDateString(),
+            'time' => $now->format('h:i A'),
             default => $now->format('l, F j, Y - h:i A'),
         };
     }

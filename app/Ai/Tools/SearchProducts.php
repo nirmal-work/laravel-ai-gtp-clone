@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Ai\Tools;
 
 use App\Models\Product;
@@ -12,25 +13,25 @@ class SearchProducts implements Tool
     /**
      * Get the description of the tool's purpose.
      */
-    public function description(): Stringable | string
+    public function description(): Stringable|string
     {
         return 'Search for products in the application database. '
-            . 'Can filter by category (Laptops, Phones, Audio, Monitors, Accessories), '
-            . 'search by keyword in product name or description, '
-            . 'and filter by maximum price. '
-            . 'Use this when the user asks about product recommendations, '
-            . 'product prices, categories, availability, or products within a budget.';
+            .'Can filter by category (Laptops, Phones, Audio, Monitors, Accessories), '
+            .'search by keyword in product name or description, '
+            .'and filter by maximum price. '
+            .'Use this when the user asks about product recommendations, '
+            .'product prices, categories, availability, or products within a budget.';
     }
 
     /**
      * Execute the tool.
      */
-    public function handle(Request $request): Stringable | string
+    public function handle(Request $request): Stringable|string
     {
         try {
 
             $category = $request['category'] ?? null;
-            $keyword  = $request['keyword'] ?? null;
+            $keyword = $request['keyword'] ?? null;
             $maxPrice = $request['max_price'] ?? null;
 
             $query = Product::query();
@@ -60,12 +61,13 @@ class SearchProducts implements Tool
             }
 
             return $products->map(function ($product) {
-                return "{$product->name} - Rs" . number_format($product->price)
-                    . "({$product->category}) - { $product->description}";
+                return "{$product->name} - Rs".number_format($product->price)
+                    ."({$product->category}) - { $product->description}";
             })
                 ->implode("\n");
         } catch (\Throwable $e) {
             report($e);
+
             return 'Product search failed. Please try again!';
         }
 
@@ -77,11 +79,11 @@ class SearchProducts implements Tool
     public function schema(JsonSchema $schema): array
     {
         return [
-            'category'  => $schema->string()
+            'category' => $schema->string()
                 ->enum(['Laptops', 'Phones', 'Audio', 'Monitors', 'Accessories'])
                 ->description('Product category to filter by.'),
 
-            'keyword'   => $schema->string()
+            'keyword' => $schema->string()
                 ->description('Keyword to search in product name or description.'),
 
             'max_price' => $schema->number()

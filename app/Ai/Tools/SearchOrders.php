@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Ai\Tools;
 
 use App\Models\Order;
@@ -12,27 +13,27 @@ class SearchOrders implements Tool
     /**
      * Get the description of the tool's purpose.
      */
-    public function description(): Stringable | string
+    public function description(): Stringable|string
     {
         return 'Search and receive order information form the application database. '
-            . 'Can filter orders by status (pending, processing, completed, cancelled), '
-            . 'by product category (Laptops, Phones, Audio, Monitors, Accessories), '
-            . 'and by date range. '
-            . 'Returns order detail including product name, quantity, total amount, '
-            . 'order status, and customer name. '
-            . 'User this when the user asks about orders, purchases, sales, '
-            . 'order status, revenue, or business insights.';
+            .'Can filter orders by status (pending, processing, completed, cancelled), '
+            .'by product category (Laptops, Phones, Audio, Monitors, Accessories), '
+            .'and by date range. '
+            .'Returns order detail including product name, quantity, total amount, '
+            .'order status, and customer name. '
+            .'User this when the user asks about orders, purchases, sales, '
+            .'order status, revenue, or business insights.';
     }
 
     /**
      * Execute the tool.
      */
-    public function handle(Request $request): Stringable | string
+    public function handle(Request $request): Stringable|string
     {
         try {
-            $status   = $request['status'] ?? null;
+            $status = $request['status'] ?? null;
             $category = $request['product_category'] ?? null;
-            $since    = $request['since'] ?? null;
+            $since = $request['since'] ?? null;
 
             $query = Order::with(['product', 'user']);
 
@@ -60,16 +61,16 @@ class SearchOrders implements Tool
 
             $result = $orders->map(function ($order) {
                 return "Order #{$order->id}: {$order->product->name} "
-                . "- Qty: {$order->quantity} "
-                . "- Rs." . number_format($order->total) . " "
-                    . "- Status: {$order->status} "
-                    . "- Customer: {$order->user->name} "
-                    . "- Date: {$order->created_at->format('d M Y')}";
+                ."- Qty: {$order->quantity} "
+                .'- Rs.'.number_format($order->total).' '
+                    ."- Status: {$order->status} "
+                    ."- Customer: {$order->user->name} "
+                    ."- Date: {$order->created_at->format('d M Y')}";
             })->implode("\n");
 
             return "Found {$orders->count()} order(s). "
-            . "Total revenue: Rs. " . number_format($totalRevenue) . "\n\n"
-                . $result;
+            .'Total revenue: Rs. '.number_format($totalRevenue)."\n\n"
+                .$result;
 
         } catch (\Throwable $e) {
             report($e);
@@ -84,7 +85,7 @@ class SearchOrders implements Tool
     public function schema(JsonSchema $schema): array
     {
         return [
-            'status'           => $schema->string()->enum(
+            'status' => $schema->string()->enum(
                 ['pending', 'processing', 'completed', 'cancelled']
             )->description('Filter orders by status.'),
 
@@ -92,7 +93,7 @@ class SearchOrders implements Tool
                 'Laptops', 'Phones', 'Audio', 'Monitors', 'Accessories',
             ]),
 
-            'since'            => $schema->string()->description('Filter orders from this date onwards. Format: Y-m-d, e.g. 2026-07-01'),
+            'since' => $schema->string()->description('Filter orders from this date onwards. Format: Y-m-d, e.g. 2026-07-01'),
         ];
     }
 }

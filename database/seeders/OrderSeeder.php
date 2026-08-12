@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use App\Models\Order;
@@ -17,7 +18,7 @@ class OrderSeeder extends Seeder
 
         if (! $user) {
             $user = User::factory()->create([
-                'name'  => 'Umesh Rana',
+                'name' => 'Umesh Rana',
                 'email' => 'umesh@example.com',
             ]);
         }
@@ -26,6 +27,7 @@ class OrderSeeder extends Seeder
 
         if ($products->isEmpty()) {
             $this->command->error('Run ProductSeeder first.');
+
             return;
         }
 

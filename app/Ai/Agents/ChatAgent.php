@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Ai\Agents;
 
 use App\Ai\Tools\GetCurrentDateTime;
@@ -10,7 +11,6 @@ use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Contracts\Conversational;
 use Laravel\Ai\Contracts\HasTools;
 use Laravel\Ai\Contracts\Tool;
-use Laravel\Ai\Enums\Lab;
 use Laravel\Ai\Promptable;
 use Stringable;
 
@@ -22,9 +22,9 @@ class ChatAgent implements Agent, Conversational, HasTools
     /**
      * Get the instructions that the agent should follow.
      */
-    public function instructions(): Stringable | string
+    public function instructions(): Stringable|string
     {
-        return <<<PROMPT
+        return <<<'PROMPT'
         You are LaraChat, a smart and friendly AI assistant built with Laravel 13 and Google Gemini.
 
         Guidelines:

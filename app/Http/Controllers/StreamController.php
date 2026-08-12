@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Ai\Agents\ChatAgent;
@@ -16,18 +17,18 @@ class StreamController extends Controller
         set_time_limit(0);
 
         $request->validate([
-            'message'         => ['nullable', 'string', 'max: 2000'],
+            'message' => ['nullable', 'string', 'max: 2000'],
             'conversation_id' => ['nullable', 'string'],
             'attachment_path' => ['nullable', 'string'],
             'attachment_mime' => ['nullable', 'string'],
         ]);
 
-        $message        = $request->input('message');
+        $message = $request->input('message');
         $conversationId = $request->input('conversation_id');
         $attachmentPath = $request->input('attachment_path');
         $attachmentMime = $request->input('attachment_mime');
 
-        Log::debug($attachmentMime . " " . $attachmentPath);
+        Log::debug($attachmentMime.' '.$attachmentPath);
 
         Log::debug('AI stream conversation returned', [
             'conversation_id' => $conversationId,
@@ -36,7 +37,7 @@ class StreamController extends Controller
         return response()->stream(function () use ($message, $conversationId, $attachmentPath, $attachmentMime) {
 
             try {
-                $agent       = new ChatAgent();
+                $agent = new ChatAgent;
                 $participant = (object) ['id' => 'guest'];
 
                 if ($conversationId) {
@@ -58,9 +59,9 @@ class StreamController extends Controller
 
                 foreach ($stream as $event) {
                     if ($event instanceof TextDelta) {
-                        echo 'data: ' . json_encode([
+                        echo 'data: '.json_encode([
                             'content' => $event->delta,
-                        ]) . "\n\n";
+                        ])."\n\n";
 
                         ob_flush();
                         flush();
@@ -72,15 +73,15 @@ class StreamController extends Controller
                     @unlink($attachmentPath);
                 }
 
-                $stream->then(function ($response) use ($attachmentPath) {
+                $stream->then(function ($response) {
 
                     Log::debug('AI stream conversation returned', [
                         'Response Conversation Id' => $response->conversationId,
                     ]);
 
-                    echo 'data: ' . json_encode([
+                    echo 'data: '.json_encode([
                         'conversation_id' => $response->conversationId,
-                    ]) . "\n\n";
+                    ])."\n\n";
 
                     ob_flush();
                     flush();
@@ -89,30 +90,30 @@ class StreamController extends Controller
             } catch (ExceptionRequestException $e) {
                 Log::error('Gemini request failed', [
                     'status' => $e->response?->status(),
-                    'body'   => $e->response?->body(),
+                    'body' => $e->response?->body(),
                 ]);
 
-                echo 'data: ' . json_encode([
+                echo 'data: '.json_encode([
                     'error' => 'Gemini request failed. Check the Laravel log.',
-                ]) . "\n\n";
+                ])."\n\n";
 
             } catch (RateLimitedException $e) {
                 $previous = $e->getPrevious();
 
                 Log::warning('Gemini rate limited', [
-                    'body'        => $previous?->response?->body(),
+                    'body' => $previous?->response?->body(),
                     'retry_after' => $previous?->response?->header('Retry-After'),
                 ]);
 
-                echo 'data: ' . json_encode([
+                echo 'data: '.json_encode([
                     'error' => 'Gemini is temporarily rate limited. Please retry shortly.',
-                ]) . "\n\n";
+                ])."\n\n";
             } catch (\Throwable $e) {
                 report($e);
 
-                echo 'data: ' . json_encode([
+                echo 'data: '.json_encode([
                     'error' => 'Something went wrong. Please try again!',
-                ]) . "\n\n";
+                ])."\n\n";
             }
 
             echo "data: [DONE]\n\n";
@@ -120,8 +121,8 @@ class StreamController extends Controller
             flush();
 
         }, 200, [
-            'Content-Type'      => 'text/event-stream',
-            'Cache-Control'     => 'no-cache',
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
             'X-Accel-Buffering' => 'no',
         ]);
 
