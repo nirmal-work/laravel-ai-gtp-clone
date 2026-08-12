@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\Log;
 use Laravel\Ai\Exceptions\RateLimitedException;
 use Laravel\Ai\Files;
 use Laravel\Ai\Streaming\Events\TextDelta;
+use Symfony\Component\HttpFoundation\Response;
 
 class StreamController extends Controller
 {
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): Response
     {
         set_time_limit(0);
 
@@ -88,9 +89,11 @@ class StreamController extends Controller
                 });
 
             } catch (ExceptionRequestException $e) {
+                $response = $e->getResponse();
+
                 Log::error('Gemini request failed', [
-                    'status' => $e->response?->status(),
-                    'body' => $e->response?->body(),
+                    'status' => $response?->getStatusCode(),
+                    'body' => $response?->getBody()?->getContents(),
                 ]);
 
                 echo 'data: '.json_encode([
@@ -99,10 +102,13 @@ class StreamController extends Controller
 
             } catch (RateLimitedException $e) {
                 $previous = $e->getPrevious();
+                $response = $previous instanceof ExceptionRequestException
+                    ? $previous->getResponse()
+                    : null;
 
                 Log::warning('Gemini rate limited', [
-                    'body' => $previous?->response?->body(),
-                    'retry_after' => $previous?->response?->header('Retry-After'),
+                    'body' => $response?->getBody()?->getContents(),
+                    'retry_after' => $response?->getHeaderLine('Retry-After'),
                 ]);
 
                 echo 'data: '.json_encode([

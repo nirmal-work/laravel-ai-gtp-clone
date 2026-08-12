@@ -15,11 +15,17 @@ class Order extends Model
         'status',
     ];
 
+    /**
+    * @return BelongsTo<User, Order>
+    */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+    * @return BelongsTo<Product, Order>
+    */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
