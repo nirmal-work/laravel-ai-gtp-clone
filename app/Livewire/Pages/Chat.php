@@ -16,6 +16,9 @@ class Chat extends Component
 
     public function render(): View
     {
-        return view('pages.chat');
+        /** @var view-string $view */
+        $view = 'pages.chat';
+
+        return view($view);
     }
 }
