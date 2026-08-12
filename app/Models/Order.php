@@ -16,16 +16,16 @@ class Order extends Model
     ];
 
     /**
-    *  @return BelongsTo<User, Order>
-    */
+     * @return BelongsTo<User, Order>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
     /**
-    *  @return BelongsTo<Product, Order>
-    */
+     * @return BelongsTo<Product, Order>
+     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
